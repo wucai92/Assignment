@@ -1,0 +1,58 @@
+---
+title: "Assessment Part 1"
+author: "Wu Cai"
+date: "2 November 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r libarary}
+library(tidyverse)
+library(maptools)
+library(RColorBrewer)
+library(classInt)
+library(OpenStreetMap)
+library(sp)
+library(rgeos)
+library(tmap)
+library(tmaptools)
+library(sf)
+library(rgdal)
+library(geojsonio)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r load & clean data, echo=FALSE}
+SingaporeMap <- read_shape("subzone-census2010-shp/Subzone_Census2010.shp", as.sf = TRUE)
+RawData <- read_csv("resident-population-by-subzone-age-group-and-sex.csv")
+PopulationData <-  spread(RawData,level_2, value)
+library(dplyr)
+PopulationData <- mutate_at(PopulationData, .vars = 'level_4', .funs=toupper)
+PopulationData_total <- PopulationData[which(PopulationData$level_1 == "Total"),]
+PopulationData_male <- PopulationData[which(PopulationData$level_1 == "Male"),]
+PopulationData_female <- PopulationData[which(PopulationData$level_1 == "Female"),]
+SingaporeMap <- append_data(SingaporeMap,PopulationData_total, key.shp = "SUBZONE_N", key.data = "level_4", ignore.duplicates = TRUE)
+```
+
+```{r plot}
+tm_shape(SingaporeMap) +
+  tm_polygons("Total", 
+              style="jenks",
+              palette="YlOrBr",
+              auto.palette.mapping=FALSE,
+              title="Population")
+
+```
+
