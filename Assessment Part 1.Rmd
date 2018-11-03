@@ -15,7 +15,7 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r libarary}
+```{r libarary, message=FALSE}
 library(tidyverse)
 library(maptools)
 library(RColorBrewer)
@@ -34,7 +34,7 @@ library(geojsonio)
 
 You can also embed plots, for example:
 
-```{r load & clean data, echo=FALSE}
+```{r load & clean data, include=FALSE}
 SingaporeMap <- read_shape("subzone-census2010-shp/Subzone_Census2010.shp", as.sf = TRUE)
 RawData <- read_csv("resident-population-by-subzone-age-group-and-sex.csv")
 PopulationData <-  spread(RawData,level_2, value)
@@ -44,15 +44,18 @@ PopulationData_total <- PopulationData[which(PopulationData$level_1 == "Total"),
 PopulationData_male <- PopulationData[which(PopulationData$level_1 == "Male"),]
 PopulationData_female <- PopulationData[which(PopulationData$level_1 == "Female"),]
 SingaporeMap <- append_data(SingaporeMap,PopulationData_total, key.shp = "SUBZONE_N", key.data = "level_4", ignore.duplicates = TRUE)
+SingaporeMap$Density <- (SingaporeMap$Total / (SingaporeMap$SHAPE_Area / (1000*1000)))
+SingaporeMap$Ageing <- (SingaporeMap$`65 - 69`+ SingaporeMap$`70 - 74`+SingaporeMap$`75 - 79`+SingaporeMap$`80 - 84`+SingaporeMap$`85 & Over`) / (SingaporeMap$Total)
 ```
 
 ```{r plot}
 tm_shape(SingaporeMap) +
-  tm_polygons("Total", 
+  tm_polygons(c("Density", "Ageing"),
               style="jenks",
               palette="YlOrBr",
               auto.palette.mapping=FALSE,
-              title="Population")
+              title=c("Population Density","Percantage of People Ageing 65+")) +
+  tm_layout(legend.position = c("right", "bottom"))
 
 ```
 
