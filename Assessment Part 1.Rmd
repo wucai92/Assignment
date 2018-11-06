@@ -20,7 +20,6 @@ library(tidyverse)
 library(maptools)
 library(RColorBrewer)
 library(classInt)
-library(OpenStreetMap)
 library(sp)
 library(rgeos)
 library(tmap)
@@ -59,3 +58,5 @@ tm_shape(SingaporeMap) +
 
 ```
 
+![R Plot](SgPopulation.png)
+![ArcGis Plot](Waliking Acess.png)
